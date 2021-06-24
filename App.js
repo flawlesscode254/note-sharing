@@ -1,21 +1,57 @@
-import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import 'react-native-gesture-handler';
+import * as React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { Ionicons } from '@expo/vector-icons';
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
+import HomeScreen from './screens/Music'
+import PlayScreen from './screens/Play';
+import ProfileScreen from './screens/Profile'
+
+const Stack = createBottomTabNavigator();
+
+const App = () => {
+
+  const tabBarOptions = {
+    showLabel: false,
+    style: {
+        backgroundColor: "#222222",
+        paddingBottom: 12,
+        paddingTop: 12
+    }
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+const screenOptions = ({ route }) => ({
+    tabBarIcon: ({ focused }) => {
+        let iconName = "home"
+
+        switch (route.name) {
+            case "Home":
+                iconName = "home"
+                break;
+            case "Messages":
+                iconName = "chatbubbles"
+                break;
+            case "Profile":
+                iconName = "person"
+                break;
+
+            default:
+                iconName = "home"
+        }
+
+        return <Ionicons name={iconName} size={24} color={focused ? "#ffffff" : "#666666"} />
+    }
+  })
+  return (
+    <NavigationContainer>
+      <Stack.Navigator tabBarOptions={tabBarOptions} screenOptions={screenOptions}>
+        <Stack.Screen name="Music" component={HomeScreen} />
+        <Stack.Screen name="Messages" component={PlayScreen} />
+        <Stack.Screen name="Profile" component={ProfileScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+};
+
+export default App
