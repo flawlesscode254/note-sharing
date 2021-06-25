@@ -10,17 +10,22 @@ const h = Dimensions.get("window").height;
 
 const Profile = () => {
     
-    // const [data, setData] = useState([])
+    const [data, setData] = useState([])
 
-    // useEffect(() => {
-    //     db.collection("songs").orderBy("time", 'desc').onSnapshot((snapshot) => {
-    //         setData(snapshot.docs.map( doc => ({
-    //             id: doc.id,
-    //             songName: doc.data().songName,
-    //             artistName: doc.data().artistName
-    //         })))
-    //     })
-    // }, [])
+    useEffect(() => {
+        db.collection("posts").orderBy("time", 'desc').onSnapshot((snapshot) => {
+            setData(snapshot.docs.map( doc => ({
+                id: doc.id,
+                username: doc.data().username,
+                profile: doc.data().profile,
+                time: doc.data().time,
+                caption: doc.data().caption,
+                file: doc.data().file,
+                likes: doc.data().likes,
+                comments: doc.data().comments
+            })))
+        })
+    }, [])
 
     return (
         <SafeAreaView style={{
@@ -82,24 +87,55 @@ const Profile = () => {
           }}
         >
         </LinearGradient>
+        <View style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            marginBottom: -20
+        }}>
+            <Image style={{
+                width: 45,
+                height: 45,
+                borderRadius: 999
+            }} source={require('../assets/photo.png')} />
+        </View>
+        <View style={{
+            marginTop: 20
+        }}>
+            <Text style={{
+                color: "yellow",
+                textAlign: "center",
+                fontSize: 30
+            }}>Your Posts</Text>
+        </View>
       </ImageBackground>
       
       </View>
        <ScrollView>
             <View style={styles.songs}>    
-                <Songs />
-                <Songs />
+                {data.map(({ id, profile, username, time, caption, file, likes, comments }) => (
+                    <Songs
+                        key={id}
+                        profile={profile}
+                        username={username}
+                        time={time}
+                        caption={caption}
+                        file={file}
+                        likes={likes}
+                        comments={comments}
+                    />
+                ))}
             </View>
       </ScrollView>
       </SafeAreaView>
     )
 }
 
-const Songs = () => {
+const Songs = ({ profile, username, time, caption, file, likes, comments }) => {
 
     return (
         <View style={styles.main}>
-            <Image source={require('../assets/photo.png')} style={{
+            <Image source={{ uri: profile }} style={{
                 width: 30,
                 height: 30,
                 borderRadius: 999,
@@ -111,24 +147,22 @@ const Songs = () => {
             }}>
                 <Text style={{
                     color: "#FFF"
-                }}>Duncan Kipkemoi</Text>
+                }}>{username}</Text>
                 <Text style={{
                     color: "#FFF",
                     marginTop: 10
-                }}>Thursday, June 24 9:39:43 PM</Text>
+                }}>{new Date(time?.toDate()).toDateString() + ' ' + ' '} <Text style={{color: "green"}}>{new Date(time?.toDate()).toLocaleTimeString()}</Text></Text>
                 <Text style={{
                     color: "#FFF",
                     marginTop: 10
                 }}>
-                    Lorem ipsum dolor sit amet consectetur adipisicing 
-                    elit. Rerum, neque necessitatibus. Mollitia expedita 
-                    ex nostrum atque iste.
+                    {caption}
                 </Text>
                 <Image style={{
                     width: 250,
                     height: 250,
                     marginTop: 10
-                }} source={{ uri: "https://cdn.motor1.com/images/mgl/mrz1e/s1/coolest-cars-feature.jpg" }} />
+                }} source={{ uri: file }} />
                 <View style={{
                     display: "flex",
                     justifyContent: "space-between",
@@ -140,27 +174,64 @@ const Songs = () => {
                     borderRadius: 15,
                     paddingVertical: 5
                 }}>
-                    <TouchableOpacity style={{
-                        backgroundColor: "#0E2A47",
-                        padding: 5,
-                        borderRadius: 999
-                    }}>
-                        <Ionicons name="heart-outline" size={30} color="#FFF" />
-                    </TouchableOpacity>
-                    <TouchableOpacity style={{
-                        backgroundColor: "#0E2A47",
-                        padding: 5,
-                        borderRadius: 999
-                    }}>
-                        <Ionicons name="chatbubble-outline" size={30} color="#FFF" />
-                    </TouchableOpacity>
-                    <TouchableOpacity style={{
-                        backgroundColor: "#0E2A47",
-                        padding: 5,
-                        borderRadius: 999
-                    }}>
-                        <Ionicons name="download-outline" size={30} color="#FFF" />
-                    </TouchableOpacity>
+
+                        <View style={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center"
+                        }}>
+                            <TouchableOpacity style={{
+                                backgroundColor: "#0E2A47",
+                                padding: 5,
+                                borderRadius: 999
+                            }}>
+                                <Ionicons name="heart-outline" size={30} color="#FFF" />
+                            </TouchableOpacity>
+                                <Text style={{
+                                    textAlign: "center",
+                                    color: "#FFF",
+                                    marginTop: 4
+                                }}>{likes}</Text>
+                        </View>
+
+                        <View style={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center"
+                        }}>
+                            <TouchableOpacity style={{
+                                backgroundColor: "#0E2A47",
+                                padding: 5,
+                                borderRadius: 999
+                            }}>
+                                <Ionicons name="chatbubble-outline" size={30} color="#FFF" />
+                            </TouchableOpacity>
+                            <Text style={{
+                                textAlign: "center",
+                                color: "#FFF",
+                                marginTop: 4
+                            }}>{comments}</Text>
+                        </View>
+
+                        <View style={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center"
+                        }}>
+                            <TouchableOpacity style={{
+                                backgroundColor: "#0E2A47",
+                                padding: 5,
+                                borderRadius: 999
+                            }}>
+                                <Ionicons name="download-outline" size={30} color="#FFF" />
+                            </TouchableOpacity>
+                            <Text style={{
+                                textAlign: "center",
+                                color: "#FFF",
+                                marginTop: 4
+                            }}>download</Text>
+                        </View>
+
                 </View>
             </View>
         </View>
@@ -191,7 +262,7 @@ const styles = StyleSheet.create({
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
-        marginBottom: 230,
+        marginBottom: 235,
         marginRight: 30,
         marginLeft: 30
     }

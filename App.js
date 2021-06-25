@@ -5,7 +5,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 
 import HomeScreen from './screens/Music'
-import PlayScreen from './screens/Play';
+import PlayScreen from './screens/Play'
 import ProfileScreen from './screens/Profile'
 
 const Stack = createBottomTabNavigator();
@@ -30,7 +30,7 @@ const screenOptions = ({ route }) => ({
                 iconName = "home"
                 break;
             case "Messages":
-                iconName = "chatbubbles"
+                iconName = "add-circle-outline"
                 break;
             case "Profile":
                 iconName = "person"
@@ -39,8 +39,7 @@ const screenOptions = ({ route }) => ({
             default:
                 iconName = "home"
         }
-
-        return <Ionicons name={iconName} size={24} color={focused ? "#ffffff" : "#666666"} />
+        return <Ionicons name={iconName} size={ iconName === "add-circle-outline" ? 45 : 24} color={focused ? "#ffffff" : "#666666"} />
     }
   })
   return (

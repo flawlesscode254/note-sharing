@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { StyleSheet, Text, View, TouchableOpacity, ActivityIndicator, TextInput, Image, KeyboardAvoidingView } from 'react-native'
+import { StyleSheet, Text, View, TouchableOpacity, ToastAndroid, ActivityIndicator, TextInput, Image, KeyboardAvoidingView } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import firebase from 'firebase';
 import * as DocumentPicker from 'expo-document-picker';
@@ -9,11 +9,13 @@ const Play = () => {
     const [one, setOne] = useState(null)
     const [loading, setLoading] = useState(false);
     const [caption, setCaption] = useState("")
+    const [title, setTitle] = useState("")
 
   const pickFile = async () => {
     await DocumentPicker.getDocumentAsync({ type: "image/*" })
     .then(async (file) => {
-        setOne(file.uri)
+        await setOne(file.uri)
+        await setTitle(file.name)
     })
 }
 
@@ -38,6 +40,7 @@ const upload = async () => {
             db.collection("posts").add({
                 username: "Duncan",
                 file: url,
+                title: title,
                 caption: caption,
                 profile: "https://cdn.motor1.com/images/mgl/mrz1e/s1/coolest-cars-feature.jpg",
                 likes: 0,

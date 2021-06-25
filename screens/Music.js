@@ -1,10 +1,31 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { StyleSheet, View, ScrollView, TextInput, SafeAreaView, TouchableOpacity, Image, Text, StatusBar } from 'react-native'
 import { Ionicons } from '@expo/vector-icons';
 import Stories from './Stories'
-import { useNavigation } from '@react-navigation/native';
+import db from '../firebase';
+import * as FileSystem from 'expo-file-system';
+import * as Permissions from 'expo-permissions';
+import * as MediaLibrary from 'expo-media-library';
 
 const Music = () => {
+    const [data, setData] = useState([])
+
+    useEffect(() => {
+        db.collection("posts").orderBy("time", 'desc').onSnapshot((snapshot) => {
+            setData(snapshot.docs.map( doc => ({
+                id: doc.id,
+                username: doc.data().username,
+                profile: doc.data().profile,
+                time: doc.data().time,
+                caption: doc.data().caption,
+                file: doc.data().file,
+                likes: doc.data().likes,
+                comments: doc.data().comments,
+                title: doc.data().title
+            })))
+        })
+    }, [])
+
     return (
         <SafeAreaView>
             <StatusBar barStyle="light-content" backgroundColor="#0E2A47" />
@@ -25,19 +46,65 @@ const Music = () => {
             </View>
                 <ScrollView>
                         <View style={styles.songs}>    
-                            <Songs />
-                            <Songs/>
+                            {data.map(({ id, profile, username, time, caption, file, likes, comments, title }) => (
+                                <Songs
+                                    key={id}
+                                    profile={profile}
+                                    username={username}
+                                    time={time}
+                                    caption={caption}
+                                    file={file}
+                                    likes={likes}
+                                    comments={comments}
+                                    title={title}
+                                />
+                            ))}
                         </View>
                 </ScrollView>
         </SafeAreaView>
     )
 }
 
-const Songs = () => {
+const Songs = ({ profile, username, time, caption, file, likes, comments, title }) => {
+    const [iname, setIname] = useState("download-outline")
+    const [col, setCol] = useState("#FFF")
+
+    const download = async () => {
+        const perm = await Permissions.askAsync(Permissions.MEDIA_LIBRARY);
+        if (perm.status != 'granted') {
+            return;
+        }
+        else {
+        try {
+            await console.log("starting download")
+            await setIname("cloud-download-outline")
+            await setCol("#46C48A")
+            const downloadResumable = FileSystem.createDownloadResumable(
+                file,
+                FileSystem.documentDirectory + title
+            );
+            const { uri } = await downloadResumable.downloadAsync();
+            const asset = await MediaLibrary.createAssetAsync(uri);
+            const album = await MediaLibrary.getAlbumAsync('Images');
+            if (album == null) {
+                await MediaLibrary.createAlbumAsync('Images', asset, false);
+                await setIname("checkmark")
+                await setCol("red")             
+            } else {
+                await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
+                await setIname("checkmark")
+                await setCol("red")       
+            }
+          } catch (e) {
+            console.log(e)
+          }
+        }
+    }
+    
 
     return (
         <View style={styles.main}>
-            <Image source={require('../assets/photo.png')} style={{
+            <Image source={{ uri: profile }} style={{
                 width: 30,
                 height: 30,
                 borderRadius: 999,
@@ -49,24 +116,22 @@ const Songs = () => {
             }}>
                 <Text style={{
                     color: "#FFF"
-                }}>Duncan Kipkemoi</Text>
+                }}>{username}</Text>
                 <Text style={{
                     color: "#FFF",
                     marginTop: 10
-                }}>Thursday, June 24 9:39:43 PM</Text>
+                }}>{new Date(time?.toDate()).toDateString() + ' ' + ' '} <Text style={{color: "green"}}>{new Date(time?.toDate()).toLocaleTimeString()}</Text></Text>
                 <Text style={{
                     color: "#FFF",
                     marginTop: 10
                 }}>
-                    Lorem ipsum dolor sit amet consectetur adipisicing 
-                    elit. Rerum, neque necessitatibus. Mollitia expedita 
-                    ex nostrum atque iste.
+                    {caption}
                 </Text>
                 <Image style={{
                     width: 250,
                     height: 250,
                     marginTop: 10
-                }} source={{ uri: "https://cdn.motor1.com/images/mgl/mrz1e/s1/coolest-cars-feature.jpg" }} />
+                }} source={{ uri: file }} />
                 <View style={{
                     display: "flex",
                     justifyContent: "space-between",
@@ -78,33 +143,69 @@ const Songs = () => {
                     borderRadius: 15,
                     paddingVertical: 5
                 }}>
-                    <TouchableOpacity style={{
-                        backgroundColor: "#0E2A47",
-                        padding: 5,
-                        borderRadius: 999
-                    }}>
-                        <Ionicons name="heart-outline" size={30} color="#FFF" />
-                    </TouchableOpacity>
-                    <TouchableOpacity style={{
-                        backgroundColor: "#0E2A47",
-                        padding: 5,
-                        borderRadius: 999
-                    }}>
-                        <Ionicons name="chatbubble-outline" size={30} color="#FFF" />
-                    </TouchableOpacity>
-                    <TouchableOpacity style={{
-                        backgroundColor: "#0E2A47",
-                        padding: 5,
-                        borderRadius: 999
-                    }}>
-                        <Ionicons name="download-outline" size={30} color="#FFF" />
-                    </TouchableOpacity>
+
+                        <View style={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center"
+                        }}>
+                            <TouchableOpacity style={{
+                                backgroundColor: "#0E2A47",
+                                padding: 5,
+                                borderRadius: 999
+                            }}>
+                                <Ionicons name="heart-outline" size={30} color="#FFF" />
+                            </TouchableOpacity>
+                                <Text style={{
+                                    textAlign: "center",
+                                    color: "#FFF",
+                                    marginTop: 4
+                                }}>{likes}</Text>
+                        </View>
+
+                        <View style={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center"
+                        }}>
+                            <TouchableOpacity style={{
+                                backgroundColor: "#0E2A47",
+                                padding: 5,
+                                borderRadius: 999
+                            }}>
+                                <Ionicons name="chatbubble-outline" size={30} color="#FFF" />
+                            </TouchableOpacity>
+                            <Text style={{
+                                textAlign: "center",
+                                color: "#FFF",
+                                marginTop: 4
+                            }}>{comments}</Text>
+                        </View>
+
+                        <View style={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center"
+                        }}>
+                            <TouchableOpacity onPress={download} style={{
+                                backgroundColor: "#0E2A47",
+                                padding: 5,
+                                borderRadius: 999
+                            }}>
+                                <Ionicons name={iname} size={30} color={col} />
+                            </TouchableOpacity>
+                            <Text style={{
+                                textAlign: "center",
+                                color: "#FFF",
+                                marginTop: 4
+                            }}>download</Text>
+                        </View>
+
                 </View>
             </View>
         </View>
     )
 }
-
 
 export default Music
 
@@ -147,7 +248,7 @@ const styles = StyleSheet.create({
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
-        marginBottom: 280,
+        marginBottom: 275,
         marginRight: 30,
         marginLeft: 30
     },
