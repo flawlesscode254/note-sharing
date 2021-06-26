@@ -16,7 +16,7 @@ const Profile = ({ navigation }) => {
         (async () => {
             await db.collection("users").where("email", "==", auth?.currentUser?.email).onSnapshot((snapshot) => {
                 snapshot.forEach(doc => {
-                    setUserProfile(doc.data())
+                    setUserProfile(doc.data().image)
                 })
             })
             await db.collection("posts").orderBy("time", 'desc').onSnapshot((snapshot) => {

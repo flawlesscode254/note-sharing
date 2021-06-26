@@ -1,15 +1,16 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { StyleSheet, Text, View, TouchableOpacity, ToastAndroid, ActivityIndicator, TextInput, Image, KeyboardAvoidingView } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import firebase from 'firebase';
 import * as DocumentPicker from 'expo-document-picker';
-import db, { store } from '../firebase' 
+import db, { auth, store } from '../firebase' 
 
 const Play = () => {
     const [one, setOne] = useState(null)
     const [loading, setLoading] = useState(false);
     const [caption, setCaption] = useState("")
     const [title, setTitle] = useState("")
+    const [userProfile, setUserProfile] = useState()
 
   const pickFile = async () => {
     await DocumentPicker.getDocumentAsync({ type: "image/*" })
@@ -23,13 +24,21 @@ const ShowToast = () => {
     ToastAndroid.show("Your post was successfully uploaded", ToastAndroid.LONG)
 }
 
-const upload = async () => {
-    
+useEffect(() => {
+  (async () => {
+    await db.collection("users").where("email", "==", auth?.currentUser?.email).onSnapshot((snapshot) => {
+      snapshot.forEach(doc => {
+          setUserProfile(doc.data().image)
+          console.log(userProfile)
+      })
+  })
+  })()
+}, [])
 
+const upload = async () => {
     await setLoading(!loading)
     const uri = one;
     const refPath = `posts/${Math.random().toString(36)}`;
-
     const response = await fetch(uri);
     const blob = await response.blob();
 
@@ -38,11 +47,11 @@ const upload = async () => {
         await storeRef.put(blob)
         await storeRef.getDownloadURL().then(url => {
             db.collection("posts").add({
-                username: "Duncan",
+                username: auth?.currentUser?.displayName,
                 file: url,
                 title: title,
                 caption: caption,
-                profile: "https://cdn.motor1.com/images/mgl/mrz1e/s1/coolest-cars-feature.jpg",
+                profile: userProfile,
                 likes: 0,
                 comments: 0,
                 time: firebase.firestore.FieldValue.serverTimestamp()
