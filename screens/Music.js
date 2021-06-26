@@ -6,6 +6,7 @@ import db from '../firebase';
 import * as FileSystem from 'expo-file-system';
 import * as Permissions from 'expo-permissions';
 import * as MediaLibrary from 'expo-media-library';
+import firebase from 'firebase';
 
 const Music = () => {
     const [data, setData] = useState([])
@@ -19,7 +20,6 @@ const Music = () => {
                 time: doc.data().time,
                 caption: doc.data().caption,
                 file: doc.data().file,
-                likes: doc.data().likes,
                 comments: doc.data().comments,
                 title: doc.data().title
             })))
@@ -46,15 +46,15 @@ const Music = () => {
             </View>
                 <ScrollView>
                         <View style={styles.songs}>    
-                            {data.map(({ id, profile, username, time, caption, file, likes, comments, title }) => (
+                            {data.map(({ id, profile, username, time, caption, file, comments, title }) => (
                                 <Songs
                                     key={id}
+                                    identifier={id}
                                     profile={profile}
                                     username={username}
                                     time={time}
                                     caption={caption}
                                     file={file}
-                                    likes={likes}
                                     comments={comments}
                                     title={title}
                                 />
@@ -65,10 +65,18 @@ const Music = () => {
     )
 }
 
-const Songs = ({ profile, username, time, caption, file, likes, comments, title }) => {
+const Songs = ({ identifier, profile, username, time, caption, file, comments, title }) => {
     const [iname, setIname] = useState("download-outline")
     const [col, setCol] = useState("#FFF")
     const [modalVisible, setModalVisible] = useState(false);
+
+    const add = firebase.firestore.FieldValue.increment(1)
+    
+    const comment = async () => {
+        await db.collection("posts").doc(identifier).update({
+            comments: add
+        })
+    }
 
     const download = async () => {
         const perm = await Permissions.askAsync(Permissions.MEDIA_LIBRARY);
@@ -178,26 +186,7 @@ const Songs = ({ profile, username, time, caption, file, likes, comments, title 
                             justifyContent: "center",
                             alignItems: "center"
                         }}>
-                            <TouchableOpacity style={{
-                                backgroundColor: "#0E2A47",
-                                padding: 5,
-                                borderRadius: 999
-                            }}>
-                                <Ionicons name="heart-outline" size={30} color="#FFF" />
-                            </TouchableOpacity>
-                                <Text style={{
-                                    textAlign: "center",
-                                    color: "#FFF",
-                                    marginTop: 4
-                                }}>{likes}</Text>
-                        </View>
-
-                        <View style={{
-                            display: "flex",
-                            justifyContent: "center",
-                            alignItems: "center"
-                        }}>
-                            <TouchableOpacity style={{
+                            <TouchableOpacity onPress={comment} style={{
                                 backgroundColor: "#0E2A47",
                                 padding: 5,
                                 borderRadius: 999

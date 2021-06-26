@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, ImageBackground, Dimensions, Image, SafeAreaView } from 'react-native'
+import { StyleSheet, ToastAndroid, Text, View, ScrollView, TouchableOpacity, ImageBackground, Dimensions, Image, SafeAreaView } from 'react-native'
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from "expo-linear-gradient";
 import db, { auth } from '../firebase';
@@ -27,7 +27,6 @@ const Profile = ({ navigation }) => {
                     time: doc.data().time,
                     caption: doc.data().caption,
                     file: doc.data().file,
-                    likes: doc.data().likes,
                     comments: doc.data().comments
                 })))
             })
@@ -44,31 +43,20 @@ const Profile = ({ navigation }) => {
             }}
         >
         <ImageBackground
-        source={{ uri: "https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8d2hpdGV8ZW58MHx8MHx8&ixlib=rb-1.2.1&w=1000&q=80" }}
-        style={{
-          height: 0.30 * h,
-        }}
-      >
+            source={{ uri: "https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8d2hpdGV8ZW58MHx8MHx8&ixlib=rb-1.2.1&w=1000&q=80" }}
+            style={{
+            height: 0.30 * h,
+            }}
+        >
         <View
           style={{
             flexDirection: "row",
-            justifyContent: "space-between",
+            justifyContent: "flex-end",
             paddingHorizontal: 20,
             marginTop: 60,
             alignItems: "center",
           }}
         >
-            <TouchableOpacity style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                backgroundColor: "gray",
-                width: 35,
-                height: 35,
-                borderRadius: 999
-            }}>
-                <Ionicons name="arrow-back" color="#FFF" size={24} />
-            </TouchableOpacity>
             <TouchableOpacity onPress={async () => {
                 await auth.signOut()
                 await navigation.navigate("SignIn")
@@ -123,15 +111,15 @@ const Profile = ({ navigation }) => {
       </View>
        <ScrollView>
             <View style={styles.songs}>    
-                {data.map(({ id, profile, username, time, caption, file, likes, comments }) => (
+                {data.map(({ id, profile, username, time, caption, file, comments }) => (
                     <Songs
                         key={id}
+                        identifier={id}
                         profile={profile}
                         username={username}
                         time={time}
                         caption={caption}
                         file={file}
-                        likes={likes}
                         comments={comments}
                     />
                 ))}
@@ -141,7 +129,16 @@ const Profile = ({ navigation }) => {
     )
 }
 
-const Songs = ({ profile, username, time, caption, file, likes, comments }) => {
+const Songs = ({ identifier, profile, username, time, caption, file, comments }) => {
+
+    const show = () => {
+        ToastAndroid.show("Your post was successfully deleted", ToastAndroid.LONG)
+    }
+
+    const take = async () => {
+        await db.collection("posts").doc(identifier).delete()
+        await show()
+    }
 
     return (
         <View style={styles.main}>
@@ -195,25 +192,6 @@ const Songs = ({ profile, username, time, caption, file, likes, comments }) => {
                                 padding: 5,
                                 borderRadius: 999
                             }}>
-                                <Ionicons name="heart-outline" size={30} color="#FFF" />
-                            </View>
-                                <Text style={{
-                                    textAlign: "center",
-                                    color: "#FFF",
-                                    marginTop: 4
-                                }}>{likes}</Text>
-                        </View>
-
-                        <View style={{
-                            display: "flex",
-                            justifyContent: "center",
-                            alignItems: "center"
-                        }}>
-                            <View style={{
-                                backgroundColor: "#0E2A47",
-                                padding: 5,
-                                borderRadius: 999
-                            }}>
                                 <Ionicons name="chatbubble-outline" size={30} color="#FFF" />
                             </View>
                             <Text style={{
@@ -228,7 +206,7 @@ const Songs = ({ profile, username, time, caption, file, likes, comments }) => {
                             justifyContent: "center",
                             alignItems: "center"
                         }}>
-                            <TouchableOpacity style={{
+                            <TouchableOpacity onPress={take} style={{
                                 backgroundColor: "#0E2A47",
                                 padding: 5,
                                 borderRadius: 999
