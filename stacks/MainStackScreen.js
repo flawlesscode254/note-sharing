@@ -28,7 +28,7 @@ const screenOptions = ({ route }) => ({
             case "Home":
                 iconName = "home"
                 break;
-            case "Messages":
+            case "Post":
                 iconName = "add-circle-outline"
                 break;
             case "Profile":
@@ -38,13 +38,17 @@ const screenOptions = ({ route }) => ({
             default:
                 iconName = "home"
         }
-        return <Ionicons name={iconName} size={ iconName === "add-circle-outline" ? 45 : 24} color={focused ? "#ffffff" : "#666666"} />
+
+        if (route.name === "Post"){
+               return <Ionicons name="add-circle-outline" size={45} color={focused ? "#ffffff" : "#E9446A"} />
+        }
+               return  <Ionicons name={iconName} size={24} color={focused ? "#ffffff" : "#666666"} />
     }
   })
   return (
       <Stack.Navigator tabBarOptions={tabBarOptions} screenOptions={screenOptions}>
         <Stack.Screen name="Music" component={HomeScreen} />
-        <Stack.Screen name="Messages" component={PlayScreen} />
+        <Stack.Screen name="Post" component={PlayScreen} />
         <Stack.Screen name="Profile" component={ProfileScreen} />
       </Stack.Navigator>
   );

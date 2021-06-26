@@ -126,7 +126,7 @@ export default Play
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#241332",
+    backgroundColor: "#0E2A47",
     flex: 1,
     display: "flex",
     alignItems: "center",

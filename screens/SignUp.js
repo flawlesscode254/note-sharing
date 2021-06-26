@@ -132,7 +132,7 @@ const SignupScreen = ({ navigation }) => {
             </TouchableOpacity>
 
             <TouchableOpacity onPress={SignIn} style={{alignSelf: "center", marginTop: 32}}>
-                    <Text style={{color: "#414959", fontSize: 13}}>
+                    <Text style={{color: "#FFF", fontSize: 13}}>
                         Already have an account? 
                         <Text style={{fontWeight: "500", color: "#E9446A"}}>
                             Sign In
@@ -148,7 +148,7 @@ export default SignupScreen
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: "#FFFFFF",
+        backgroundColor: "#0E2A47",
         flex: 1,
         display: "flex",
         alignItems: "center",
@@ -158,7 +158,8 @@ const styles = StyleSheet.create({
         marginTop: 40,
         fontSize: 18,
         fontWeight: "400",
-        textAlign: "center"
+        textAlign: "center",
+        color: "#FFF"
     },
     errorMessage: {
         height: 72,
@@ -171,16 +172,16 @@ const styles = StyleSheet.create({
         marginHorizontal: 30
     },
     inputTitle: {
-        color: "#8A8F9E",
+        color: "#FFF",
         fontSize: 10,
         textTransform: "uppercase"
     },
     input: {
-        borderBottomColor: "#8A8F9E",
+        borderBottomColor: "#FFF",
         borderBottomWidth: StyleSheet.hairlineWidth,
         height: 40,
         fontSize: 15,
-        color: "#161F3D"
+        color: "#FFF"
     },
     button: {
         marginHorizontal: 30,
