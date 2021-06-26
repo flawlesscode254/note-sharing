@@ -2,29 +2,36 @@ import React, { useState, useEffect } from 'react'
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, ImageBackground, Dimensions, Image, SafeAreaView } from 'react-native'
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from "expo-linear-gradient";
-
-import db from '../firebase'
+import db, { auth } from '../firebase';
 
 
 const h = Dimensions.get("window").height;
 
-const Profile = () => {
+const Profile = ({ navigation }) => {
     
     const [data, setData] = useState([])
+    const [userProfile, setUserProfile] = useState()
 
     useEffect(() => {
-        db.collection("posts").orderBy("time", 'desc').onSnapshot((snapshot) => {
-            setData(snapshot.docs.map( doc => ({
-                id: doc.id,
-                username: doc.data().username,
-                profile: doc.data().profile,
-                time: doc.data().time,
-                caption: doc.data().caption,
-                file: doc.data().file,
-                likes: doc.data().likes,
-                comments: doc.data().comments
-            })))
-        })
+        (async () => {
+            await db.collection("users").where("email", "==", auth?.currentUser?.email).onSnapshot((snapshot) => {
+                snapshot.forEach(doc => {
+                    setUserProfile(doc.data())
+                })
+            })
+            await db.collection("posts").orderBy("time", 'desc').onSnapshot((snapshot) => {
+                setData(snapshot.docs.map( doc => ({
+                    id: doc.id,
+                    username: doc.data().username,
+                    profile: doc.data().profile,
+                    time: doc.data().time,
+                    caption: doc.data().caption,
+                    file: doc.data().file,
+                    likes: doc.data().likes,
+                    comments: doc.data().comments
+                })))
+            })
+        })()
     }, [])
 
     return (
@@ -37,7 +44,7 @@ const Profile = () => {
             }}
         >
         <ImageBackground
-        source={{ uri: "https://images.unsplash.com/photo-1600119692885-8b04faa7f329?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=749&q=80" }}
+        source={{ uri: "https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8d2hpdGV8ZW58MHx8MHx8&ixlib=rb-1.2.1&w=1000&q=80" }}
         style={{
           height: 0.30 * h,
         }}
@@ -62,7 +69,10 @@ const Profile = () => {
             }}>
                 <Ionicons name="arrow-back" color="#FFF" size={24} />
             </TouchableOpacity>
-            <TouchableOpacity style={{
+            <TouchableOpacity onPress={async () => {
+                await auth.signOut()
+                await navigation.navigate("SignIn")
+            }} style={{
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
@@ -71,7 +81,7 @@ const Profile = () => {
                 height: 35,
                 borderRadius: 999
             }}>
-            <Ionicons name="log-out-outline" color="#FFF" size={24} />
+                <Ionicons name="log-out-outline" color="#FFF" size={24} />
             </TouchableOpacity>
         </View>
         <LinearGradient
@@ -97,13 +107,13 @@ const Profile = () => {
                 width: 45,
                 height: 45,
                 borderRadius: 999
-            }} source={require('../assets/photo.png')} />
+            }} source={{ uri: userProfile }} />
         </View>
         <View style={{
             marginTop: 20
         }}>
             <Text style={{
-                color: "yellow",
+                color: "black",
                 textAlign: "center",
                 fontSize: 30
             }}>Your Posts</Text>
@@ -180,13 +190,13 @@ const Songs = ({ profile, username, time, caption, file, likes, comments }) => {
                             justifyContent: "center",
                             alignItems: "center"
                         }}>
-                            <TouchableOpacity style={{
+                            <View style={{
                                 backgroundColor: "#0E2A47",
                                 padding: 5,
                                 borderRadius: 999
                             }}>
                                 <Ionicons name="heart-outline" size={30} color="#FFF" />
-                            </TouchableOpacity>
+                            </View>
                                 <Text style={{
                                     textAlign: "center",
                                     color: "#FFF",
@@ -199,13 +209,13 @@ const Songs = ({ profile, username, time, caption, file, likes, comments }) => {
                             justifyContent: "center",
                             alignItems: "center"
                         }}>
-                            <TouchableOpacity style={{
+                            <View style={{
                                 backgroundColor: "#0E2A47",
                                 padding: 5,
                                 borderRadius: 999
                             }}>
                                 <Ionicons name="chatbubble-outline" size={30} color="#FFF" />
-                            </TouchableOpacity>
+                            </View>
                             <Text style={{
                                 textAlign: "center",
                                 color: "#FFF",
@@ -223,13 +233,13 @@ const Songs = ({ profile, username, time, caption, file, likes, comments }) => {
                                 padding: 5,
                                 borderRadius: 999
                             }}>
-                                <Ionicons name="download-outline" size={30} color="#FFF" />
+                                <Ionicons name="trash-outline" size={30} color="red" />
                             </TouchableOpacity>
                             <Text style={{
                                 textAlign: "center",
                                 color: "#FFF",
                                 marginTop: 4
-                            }}>download</Text>
+                            }}>delete</Text>
                         </View>
 
                 </View>
