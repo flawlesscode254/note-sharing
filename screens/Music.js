@@ -6,7 +6,6 @@ import db, { auth } from '../firebase';
 import * as FileSystem from 'expo-file-system';
 import * as Permissions from 'expo-permissions';
 import * as MediaLibrary from 'expo-media-library';
-import { useNavigation } from '@react-navigation/core';
 
 const Music = () => {
     const [data, setData] = useState([])
@@ -20,7 +19,6 @@ const Music = () => {
                 time: doc.data().time,
                 caption: doc.data().caption,
                 file: doc.data().file,
-                comments: doc.data().comments,
                 title: doc.data().title
             })))
         })
@@ -46,7 +44,7 @@ const Music = () => {
             </View>
                 <ScrollView>
                         <View style={styles.songs}>    
-                            {data.map(({ id, profile, username, time, caption, file, comments, title }) => (
+                            {data.map(({ id, profile, username, time, caption, file, title }) => (
                                 <Songs
                                     key={id}
                                     identifier={id}
@@ -55,7 +53,6 @@ const Music = () => {
                                     time={time}
                                     caption={caption}
                                     file={file}
-                                    comments={comments}
                                     title={title}
                                 />
                             ))}
@@ -65,17 +62,10 @@ const Music = () => {
     )
 }
 
-const Songs = ({ identifier, profile, username, time, caption, file, comments, title }) => {
+const Songs = ({ profile, username, time, caption, file, title }) => {
     const [iname, setIname] = useState("download-outline")
     const [col, setCol] = useState("#FFF")
     const [modalVisible, setModalVisible] = useState(false);
-    const navigation = useNavigation()
-    
-    // const comment = async () => {
-    //     await db.collection("posts").doc(identifier).update({
-    //         comments: add
-    //     })
-    // }
 
     const download = async () => {
         const perm = await Permissions.askAsync(Permissions.MEDIA_LIBRARY);
@@ -170,7 +160,7 @@ const Songs = ({ identifier, profile, username, time, caption, file, comments, t
                 }} source={{ uri: file }} />
                 <View style={{
                     display: "flex",
-                    justifyContent: "space-between",
+                    justifyContent: "center",
                     alignItems: "center",
                     marginTop: 10,
                     flexDirection: "row",
@@ -179,30 +169,6 @@ const Songs = ({ identifier, profile, username, time, caption, file, comments, t
                     borderRadius: 15,
                     paddingVertical: 5
                 }}>
-
-                        <View style={{
-                            display: "flex",
-                            justifyContent: "center",
-                            alignItems: "center"
-                        }}>
-                            <TouchableOpacity onPress={() => navigation.navigate("Comments", {
-                                username: auth?.currentUser?.displayName,
-                                name: username,
-                                id: identifier,
-                                time: time
-                            })} style={{
-                                backgroundColor: "#0E2A47",
-                                padding: 5,
-                                borderRadius: 999
-                            }}>
-                                <Ionicons name="chatbubble-outline" size={30} color="#FFF" />
-                            </TouchableOpacity>
-                            <Text style={{
-                                textAlign: "center",
-                                color: "#FFF",
-                                marginTop: 4
-                            }}>{comments}</Text>
-                        </View>
 
                         <View style={{
                             display: "flex",

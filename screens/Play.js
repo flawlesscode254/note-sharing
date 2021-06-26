@@ -52,8 +52,6 @@ const upload = async () => {
                 title: title,
                 caption: caption,
                 profile: userProfile,
-                likes: 0,
-                comments: 0,
                 time: firebase.firestore.FieldValue.serverTimestamp()
             })
             await db.collection(auth?.currentUser?.email).add({
@@ -62,8 +60,6 @@ const upload = async () => {
                 title: title,
                 caption: caption,
                 profile: userProfile,
-                likes: 0,
-                comments: 0,
                 time: firebase.firestore.FieldValue.serverTimestamp()
             })
         })

@@ -3,7 +3,6 @@ import { StyleSheet, ToastAndroid, Text, View, ScrollView, TouchableOpacity, Ima
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from "expo-linear-gradient";
 import db, { auth } from '../firebase';
-import { useNavigation } from '@react-navigation/core';
 
 
 const h = Dimensions.get("window").height;
@@ -31,8 +30,7 @@ const Profile = ({ navigation }) => {
                 profile: doc.data().profile,
                 time: doc.data().time,
                 caption: doc.data().caption,
-                file: doc.data().file,
-                comments: doc.data().comments
+                file: doc.data().file
             })))
         })
     }, [])
@@ -115,7 +113,7 @@ const Profile = ({ navigation }) => {
       </View>
        <ScrollView>
             <View style={styles.songs}>    
-                {data.map(({ id, profile, username, time, caption, file, comments }) => (
+                {data.map(({ id, profile, username, time, caption, file }) => (
                     <Songs
                         key={id}
                         identifier={id}
@@ -124,7 +122,6 @@ const Profile = ({ navigation }) => {
                         time={time}
                         caption={caption}
                         file={file}
-                        comments={comments}
                     />
                 ))}
             </View>
@@ -148,8 +145,7 @@ const Warn = () => {
     )
 }
 
-const Songs = ({ identifier, profile, username, time, caption, file, comments }) => {
-    const navigation = useNavigation()
+const Songs = ({ identifier, profile, username, time, caption, file }) => {
 
     const show = () => {
         ToastAndroid.show("Your post was successfully deleted!!", ToastAndroid.LONG)
@@ -192,7 +188,7 @@ const Songs = ({ identifier, profile, username, time, caption, file, comments })
                 }} source={{ uri: file }} />
                 <View style={{
                     display: "flex",
-                    justifyContent: "space-between",
+                    justifyContent: "center",
                     alignItems: "center",
                     marginTop: 10,
                     flexDirection: "row",
@@ -201,30 +197,6 @@ const Songs = ({ identifier, profile, username, time, caption, file, comments })
                     borderRadius: 15,
                     paddingVertical: 5
                 }}>
-
-                        <View style={{
-                            display: "flex",
-                            justifyContent: "center",
-                            alignItems: "center"
-                        }}>
-                            <TouchableOpacity onPress={() => navigation.navigate("Comments", {
-                                username: auth?.currentUser?.displayName,
-                                name: username,
-                                id: identifier,
-                                time: time
-                            })} style={{
-                                backgroundColor: "#0E2A47",
-                                padding: 5,
-                                borderRadius: 999
-                            }}>
-                                <Ionicons name="chatbubble-outline" size={30} color="#FFF" />
-                            </TouchableOpacity>
-                            <Text style={{
-                                textAlign: "center",
-                                color: "#FFF",
-                                marginTop: 4
-                            }}>{comments}</Text>
-                        </View>
 
                         <View style={{
                             display: "flex",
