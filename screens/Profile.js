@@ -3,6 +3,7 @@ import { StyleSheet, ToastAndroid, Text, View, ScrollView, TouchableOpacity, Ima
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from "expo-linear-gradient";
 import db, { auth } from '../firebase';
+import { useNavigation } from '@react-navigation/core';
 
 
 const h = Dimensions.get("window").height;
@@ -130,6 +131,7 @@ const Profile = ({ navigation }) => {
 }
 
 const Songs = ({ identifier, profile, username, time, caption, file, comments }) => {
+    const navigation = useNavigation()
 
     const show = () => {
         ToastAndroid.show("Your post was successfully deleted!!", ToastAndroid.LONG)
@@ -187,13 +189,18 @@ const Songs = ({ identifier, profile, username, time, caption, file, comments })
                             justifyContent: "center",
                             alignItems: "center"
                         }}>
-                            <View style={{
+                            <TouchableOpacity onPress={() => navigation.navigate("Comments", {
+                                username: auth?.currentUser?.displayName,
+                                name: username,
+                                id: identifier,
+                                time: time
+                            })} style={{
                                 backgroundColor: "#0E2A47",
                                 padding: 5,
                                 borderRadius: 999
                             }}>
                                 <Ionicons name="chatbubble-outline" size={30} color="#FFF" />
-                            </View>
+                            </TouchableOpacity>
                             <Text style={{
                                 textAlign: "center",
                                 color: "#FFF",

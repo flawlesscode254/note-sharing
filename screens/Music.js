@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react'
 import { StyleSheet, Modal, View, ScrollView, TextInput, SafeAreaView, TouchableOpacity, Image, Text, StatusBar } from 'react-native'
 import { Ionicons } from '@expo/vector-icons';
 import Stories from './Stories'
-import db from '../firebase';
+import db, { auth } from '../firebase';
 import * as FileSystem from 'expo-file-system';
 import * as Permissions from 'expo-permissions';
 import * as MediaLibrary from 'expo-media-library';
-import firebase from 'firebase';
+import { useNavigation } from '@react-navigation/core';
 
 const Music = () => {
     const [data, setData] = useState([])
@@ -69,14 +69,13 @@ const Songs = ({ identifier, profile, username, time, caption, file, comments, t
     const [iname, setIname] = useState("download-outline")
     const [col, setCol] = useState("#FFF")
     const [modalVisible, setModalVisible] = useState(false);
-
-    const add = firebase.firestore.FieldValue.increment(1)
+    const navigation = useNavigation()
     
-    const comment = async () => {
-        await db.collection("posts").doc(identifier).update({
-            comments: add
-        })
-    }
+    // const comment = async () => {
+    //     await db.collection("posts").doc(identifier).update({
+    //         comments: add
+    //     })
+    // }
 
     const download = async () => {
         const perm = await Permissions.askAsync(Permissions.MEDIA_LIBRARY);
@@ -186,7 +185,12 @@ const Songs = ({ identifier, profile, username, time, caption, file, comments, t
                             justifyContent: "center",
                             alignItems: "center"
                         }}>
-                            <TouchableOpacity onPress={comment} style={{
+                            <TouchableOpacity onPress={() => navigation.navigate("Comments", {
+                                username: auth?.currentUser?.displayName,
+                                name: username,
+                                id: identifier,
+                                time: time
+                            })} style={{
                                 backgroundColor: "#0E2A47",
                                 padding: 5,
                                 borderRadius: 999
@@ -218,7 +222,6 @@ const Songs = ({ identifier, profile, username, time, caption, file, comments, t
                                 marginTop: 4
                             }}>download</Text>
                         </View>
-
                 </View>
             </View>
         </View>
