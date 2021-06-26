@@ -45,8 +45,18 @@ const upload = async () => {
     try {
         const storeRef = store.ref(refPath)
         await storeRef.put(blob)
-        await storeRef.getDownloadURL().then(url => {
-            db.collection("posts").add({
+        await storeRef.getDownloadURL().then(async (url) => {
+            await db.collection("posts").add({
+                username: auth?.currentUser?.displayName,
+                file: url,
+                title: title,
+                caption: caption,
+                profile: userProfile,
+                likes: 0,
+                comments: 0,
+                time: firebase.firestore.FieldValue.serverTimestamp()
+            })
+            await db.collection(auth?.currentUser?.email).add({
                 username: auth?.currentUser?.displayName,
                 file: url,
                 title: title,

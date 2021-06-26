@@ -85,6 +85,7 @@ const CommentsScreen = ({ route, navigation }) => {
                 onChangeText={(text) => setInput(text)}
                 placeholder="Enter a comment..."
                 style={styles.textInput}
+                keyboardType="default"
               />
               <TouchableOpacity onPress={sendMessage} activeOpacity={0.5}>
                 <Ionicons name="send" color="#2B68E6" size={24} />

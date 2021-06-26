@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { StyleSheet, ToastAndroid, Text, View, ScrollView, TouchableOpacity, ImageBackground, Dimensions, Image, SafeAreaView } from 'react-native'
+import { StyleSheet, ToastAndroid, Text, View, ScrollView, TouchableOpacity, ImageBackground, Dimensions, Image, SafeAreaView, Alert } from 'react-native'
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from "expo-linear-gradient";
 import db, { auth } from '../firebase';
@@ -20,18 +20,21 @@ const Profile = ({ navigation }) => {
                     setUserProfile(doc.data().image)
                 })
             })
-            await db.collection("posts").orderBy("time", 'desc').onSnapshot((snapshot) => {
-                setData(snapshot.docs.map( doc => ({
-                    id: doc.id,
-                    username: doc.data().username,
-                    profile: doc.data().profile,
-                    time: doc.data().time,
-                    caption: doc.data().caption,
-                    file: doc.data().file,
-                    comments: doc.data().comments
-                })))
-            })
         })()
+    }, [])
+
+    useEffect(() => {
+            db.collection(auth?.currentUser?.email).orderBy("time", 'desc').onSnapshot((snapshot) => {
+            setData(snapshot.docs.map( doc => ({
+                id: doc.id,
+                username: doc.data().username,
+                profile: doc.data().profile,
+                time: doc.data().time,
+                caption: doc.data().caption,
+                file: doc.data().file,
+                comments: doc.data().comments
+            })))
+        })
     }, [])
 
     return (
@@ -130,6 +133,21 @@ const Profile = ({ navigation }) => {
     )
 }
 
+const Warn = () => {
+    return (
+        <View style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center"
+        }}>
+            <Text style={{
+                fontSize: 20,
+                marginTop: 200
+            }}>You have not made any posts yet!!!</Text>
+        </View>
+    )
+}
+
 const Songs = ({ identifier, profile, username, time, caption, file, comments }) => {
     const navigation = useNavigation()
 
@@ -141,7 +159,7 @@ const Songs = ({ identifier, profile, username, time, caption, file, comments })
         await db.collection("posts").doc(identifier).delete()
         await show()
     }
-
+   
     return (
         <View style={styles.main}>
             <Image source={{ uri: profile }} style={{
