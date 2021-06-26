@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { StyleSheet, View, ScrollView, TextInput, SafeAreaView, TouchableOpacity, Image, Text, StatusBar } from 'react-native'
+import { StyleSheet, Modal, View, ScrollView, TextInput, SafeAreaView, TouchableOpacity, Image, Text, StatusBar } from 'react-native'
 import { Ionicons } from '@expo/vector-icons';
 import Stories from './Stories'
 import db from '../firebase';
@@ -68,6 +68,7 @@ const Music = () => {
 const Songs = ({ profile, username, time, caption, file, likes, comments, title }) => {
     const [iname, setIname] = useState("download-outline")
     const [col, setCol] = useState("#FFF")
+    const [modalVisible, setModalVisible] = useState(false);
 
     const download = async () => {
         const perm = await Permissions.askAsync(Permissions.MEDIA_LIBRARY);
@@ -104,13 +105,41 @@ const Songs = ({ profile, username, time, caption, file, likes, comments, title 
 
     return (
         <View style={styles.main}>
-            <Image source={{ uri: profile }} style={{
-                width: 30,
-                height: 30,
-                borderRadius: 999,
-                marginRight: 20,
-                marginLeft: 20
-            }} />
+             <View style={styles.centeredView}>
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={modalVisible}
+                    onRequestClose={() => {
+                    Alert.alert("Modal has been closed.");
+                    setModalVisible(!modalVisible);
+                    }}
+                >
+                    <View style={styles.centeredView}>
+                    <View style={styles.modalView}>
+                            <Image  style={styles.image} source={{ uri: profile }} />
+                        <TouchableOpacity style={{
+                            backgroundColor: "blue",
+                            marginTop: 5,
+                            marginBottom: 5,
+                            paddingHorizontal: 20,
+                            borderRadius: 999
+                        }} onPress={() => setModalVisible(!modalVisible)}>
+                                <Text style={styles.textStyle}>X</Text>
+                        </TouchableOpacity>
+                    </View>
+                    </View>
+                </Modal>
+            </View>
+            <TouchableOpacity onPress={() => setModalVisible(true)}>
+                <Image source={{ uri: profile }} style={{
+                    width: 30,
+                    height: 30,
+                    borderRadius: 999,
+                    marginRight: 20,
+                    marginLeft: 20
+                }} />
+            </TouchableOpacity>
             <View style={{
                 marginRight: 20
             }}>
@@ -266,5 +295,44 @@ const styles = StyleSheet.create({
         marginLeft: 20,
         marginRight: 20,
         paddingVertical: 10
+    },
+    centeredView: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        marginTop: 22
+    },
+    modalView: {
+        margin: 20,
+        backgroundColor: "white",
+        borderRadius: 20,
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        width: 300,
+        alignItems: "center",
+        shadowColor: "#000",
+        shadowOffset: {
+          width: 0,
+          height: 2
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5
+    },
+    modalText: {
+        marginBottom: 15,
+        textAlign: "center"
+    },
+    textStyle: {
+        color: "white",
+        fontWeight: "bold",
+        textAlign: "center"
+    },
+    image: {
+        width: 280,
+        height: 280,
+        borderRadius: 12,
+        marginTop: 10
     }
 })
