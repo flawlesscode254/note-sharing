@@ -132,7 +132,7 @@ const Profile = ({ navigation }) => {
 const Songs = ({ identifier, profile, username, time, caption, file, comments }) => {
 
     const show = () => {
-        ToastAndroid.show("Your post was successfully deleted", ToastAndroid.LONG)
+        ToastAndroid.show("Your post was successfully deleted!!", ToastAndroid.LONG)
     }
 
     const take = async () => {
