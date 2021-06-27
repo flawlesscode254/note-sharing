@@ -83,9 +83,9 @@ const Songs = ({ profile, username, time, caption, file, title }) => {
             );
             const { uri } = await downloadResumable.downloadAsync();
             const asset = await MediaLibrary.createAssetAsync(uri);
-            const album = await MediaLibrary.getAlbumAsync('Images');
+            const album = await MediaLibrary.getAlbumAsync('Flood');
             if (album == null) {
-                await MediaLibrary.createAlbumAsync('Images', asset, false);
+                await MediaLibrary.createAlbumAsync('Flood', asset, false);
                 await setIname("checkmark")
                 await setCol("red")             
             } else {

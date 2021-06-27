@@ -130,20 +130,6 @@ const Profile = ({ navigation }) => {
     )
 }
 
-const Warn = () => {
-    return (
-        <View style={{
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center"
-        }}>
-            <Text style={{
-                fontSize: 20,
-                marginTop: 200
-            }}>You have not made any posts yet!!!</Text>
-        </View>
-    )
-}
 
 const Songs = ({ identifier, profile, username, time, caption, file }) => {
 

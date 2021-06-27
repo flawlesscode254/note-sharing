@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "chat",
-    "slug": "chat",
+    "name": "flood",
+    "slug": "flood",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/flood.png",
@@ -24,7 +24,7 @@
         "foregroundImage": "./assets/flood.png",
         "backgroundColor": "#FFFFFF"
       },
-      "package": "com.duncanii.chat"
+      "package": "com.duncanii.flood"
     },
     "web": {
       "favicon": "./assets/flood.png"
